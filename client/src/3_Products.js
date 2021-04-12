@@ -52,18 +52,21 @@ export const Products = connect (
         <div>
         <h2>Products List</h2>
 
-        <table className="table table-hover" onClick={(e)=>{
+        <table className="table table-hover table-sortable" onClick={(e)=>{
           if (e.target.dataset.id)
           // alert(e.target.dataset.id)
           // debugger
           // View Product Detail Page
             this.props.history.push("/detail-product/" + e.target.dataset.id)
-          }}><tbody>
+          }}>
 
           {/* Add Header */}
+          <thead>
           {header && <tr>{fields.map((n, i) => <th key={i}>{fieldList[n]}</th>)}<td></td><td></td></tr>}
+          </thead>
 
           {/* Add Rows */}
+          <tbody>
           {products.map(product => (
           <tr key={product[id]} data-id={product[id]}>
 
