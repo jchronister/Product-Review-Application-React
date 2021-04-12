@@ -4,13 +4,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import {createStore, combineReducers} from "redux"
+import {createStore, combineReducers, applyMiddleware} from "redux"
 import {Provider} from "react-redux"
 
 import {authorizationReducer} from "./9_Reducer_Auth"
 import {productReducer} from "./9_Reducer_products"
 
 import Axios from "axios"
+import thunk from "redux-thunk"
 
 // Axios Config
 export const axios = Axios.create({
@@ -27,7 +28,7 @@ const reducer = combineReducers({
 })
 
 // Create Store
-const store = createStore(reducer)
+const store = createStore(reducer, applyMiddleware(thunk))
 
 ReactDOM.render(
   <React.StrictMode>

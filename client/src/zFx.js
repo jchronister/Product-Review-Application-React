@@ -1,39 +1,58 @@
 
 
 
-// Handle All Server Requests and Errors
-// Returns Data from Server and Applys all then Fx's
 /**
-* 
-*   @param {Promise} axiosRequest - Axios Request Promise
-*   @param {function} thenFx - then Callback Functions to Chain
-*
+*   Axios Request Proxy to Apply Callback Functions & Handle Errors
+*   @param {Promise} axiosReq - axios Request Returned Promise
+*   @param {function} thenFx - n Functions to Apply as then
 */
-export function request(axiosRequest, ...thenFx) {
+export function axiosRequest (axiosReq, ...thenFx) {
 
-  const req = axiosRequest.then(res => {
-    
-    // Throw Server Error
+  // Server Request - Pass Good Data and Throw All Errors
+  const request = axiosReq.then(data => {
 
-    // Return Server Data
-    return res.response.data
-    
+// debugger
+    // Return Object Data
+    if (data.data && data.data.status === "Success") return data.data
+
+    // Throw Non Server Response Object Error
+    throw (data.data)
   })
 
-  // Apply then Fx's
-  thenFx.reduce((a, n) => a.then(n), req)
+  // Apply Callback Functions
+  thenFx.reduce((a, n) => a.then(n), request)
 
-  // Error Handling
-  .catch(error => {
+  // Handle Errors
+  .catch(err => {
 
-      // Message Error Responses
+// debugger
+
+    if (err.response && err.response.data && err.response.data.error) {
+
+      // Show Server Response Error 
+      alert("Server Message\n" + Object.entries(err.response.data).join("\n"))
+    
+    } else if (err.response  ) {
+
+      // Show Axios Reponse Error
+      alert("Axios Error See Console")
+      console.log(err.response)
+
+    } else {
+
+      // Other Error
+      console.log("Request Error", err)
+      alert("Request Error.\n" + JSON.stringify(err, null, 2) + "\nSee Console for Details")
+
+    } 
 
   })
 
-  // Catch All
-  .catch(error => alert(error))
+  // Catch All Misc Errors
+  .catch((err)=>alert("Unknown Error - Programming Logic Error: " + err))
 
 }
+
 
 
 /** Checks for Invalid/Missing Data

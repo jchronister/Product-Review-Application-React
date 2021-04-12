@@ -26,3 +26,6 @@ export const productTextboxChangeFx = (name, value) => action(productTextboxChan
 
 export const productClearTextbox = "productClearTextbox"
 export const productClearTextboxFx = () => action(productClearTextbox)
+
+export const setUserInfo = "setUserInfo"
+export const setUserInfoFx = (data) => action(setUserInfo, data)

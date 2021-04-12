@@ -18,7 +18,9 @@ export function authorizationReducer(state = initialState, action) {
     case act.textboxChange:
       return {...state, [action.payload.name]: action.payload.value}
 
-    case act.login:
+    // Login Fall Through for Testing
+    case act.login: //????????
+    case act.setUserInfo:
       var data = {username: action.payload.username, role: action.payload.role}
       return {...state, currentUser: data}
      

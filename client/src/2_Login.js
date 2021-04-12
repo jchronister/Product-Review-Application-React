@@ -4,9 +4,11 @@ import {Component} from "react"
 import {connect} from "react-redux"
 
 import {Textbox, XButton} from "./zComponents"
-import {textboxChangeFx, loginFx} from "./9.1_Actions"
+import {textboxChangeFx, loginFx, setUserInfoFx} from "./9.1_Actions"
 
-import {request, isMissing} from "./zFx"
+import jwt from "jsonwebtoken"
+
+import {axiosRequest, isMissing} from "./zFx"
 import {axios} from "./index"
 
 
@@ -21,7 +23,8 @@ export const Login = connect(
   // MapDispatchToProps
   dispatch => ({
     inputChange: ({target : {name, value}}) => dispatch(textboxChangeFx(name, value)),
-    login: (user, role) => dispatch(loginFx(user, role))
+    loginTest: (user, role) => dispatch(loginFx(user, role)),
+    login: (fx) => dispatch(fx)
   })
 
 )(
@@ -46,7 +49,7 @@ export const Login = connect(
       // Required Data
       const required = {username: "Username", password: "Password"}
       
-      // 
+      // Get User Input
       const {username, password} = this.props
       const info = {username, password}
 
@@ -54,33 +57,32 @@ export const Login = connect(
       const missing = isMissing(Object.keys(required), info,required)
       if (missing) return alert(missing[1])
  
-      // alert(path + "request data" + info)
-      this.props.login(username, "SuperUser")
-      // request(axios.post("url",{}), 
-   
-      //   (data) => {
-          // Login Callback Function
-          // (data) => {
+      // Account Setup for Testing ????????????????????
+      this.props.loginTest(username, "SuperUser")
 
-          //   // Set Axios Token
-          //   axios.defaults.headers.common['Authorization'] = data.data;
+      this.props.login( 
 
-          //   // Update User Info State
-          //   dispatch(actionType.setUserInfoFx(jwt.decode(data.data)))
+          dispatch => {
 
-          //   // Go to Main Page
-          //   this.props.history.replace("./")
+              axiosRequest(axios.post(path, info), 
+      
+              // Login Callback Function
+              data => {
 
-          // }
-      //     // Setup Axios Token
+                // Set Axios Token
+                axios.defaults.headers.common['Authorization'] = data.data;
 
-      //     // Store User Info
+                // Update User Info State
+                dispatch(setUserInfoFx(jwt.decode(data.data)))
 
-          // Go to Main Page
-          this.props.history.push("/")
+                // Go to Main Page
+                this.props.history.replace("./")
 
-      //   }
-      // )
+              })
+            }
+
+          )
+
     }
 
     render () {
