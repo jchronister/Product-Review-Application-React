@@ -72,15 +72,18 @@ export function ToggleButtonGroupControlled() {
 // onChange
 export function Textbox (props) {
 
-  const {id, name, labelCaption, ...attributes} = props
+  const {id, name, labelCaption, className, ...attributes} = props
 
   return [
-  <label htmlFor={id || name}>{labelCaption}</label>,
+  <label htmlFor={id || name} key = {name + 0}>{labelCaption}</label>,
   <input
     type="text"
-    className= {props.className || "mx-sm-3"}
+    key = {name + 1}
+    className= {className || "mx-sm-3"}
     id={id || name}
+    name={name}
     {...attributes}
+     
   />
   ]
 
@@ -94,3 +97,45 @@ export const XButton = React.memo(function ({title, ...attributes}) {
   return (<Button {...attributes}>{title || "Click"}</Button>)
 
 })
+
+
+
+
+// Textbox or Text Area with Label
+export function FormTextbox (props) {
+
+  const {textArea, title, name, id={name}, ...attributes} = props
+
+  return (
+    <div className="form-group">
+    <label className="control-label col-sm-2" htmlFor={id}>{title}:</label>
+    <div className="col-sm-10">
+      {textArea
+        ?
+        <textarea required className="form-control" id={id} rows="3" name={name} {...attributes}></textarea>  
+        :
+        <input required type="text" className="form-control" id={id} name={name} {...attributes}/>
+      }
+      
+    </div>
+    </div>
+  )
+
+}
+
+
+// Render Radio Buttons
+export function FormRadio (props) {
+
+  const {title, name, id={name}, ...attributes} = props
+
+  return (
+
+    <div className="form-check">
+      <input required type="radio" className="form-check-input" id={id} name={name} {...attributes}/>
+      <label className="form-check-label" htmlFor={id}>{title}</label>
+    </div>
+
+  )
+
+}

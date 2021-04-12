@@ -1,14 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
 
-import {Products, ProductDetails} from "./products"
-import {UpsertReview} from "./reviews"
-import {UserAccounts} from "./superUser"
+import {Products, ProductDetails} from "./3_Products"
+import {UpsertReview} from "./4_Reviews"
+import {UserAccounts} from "./5_SuperUser"
+
+import {MainRouter} from "./1_Router"
+
+
 
 function App() {
   return (
-    <UserAccounts/>
+    <MainRouter/>
   );
 }
 
 export default App;
+ 

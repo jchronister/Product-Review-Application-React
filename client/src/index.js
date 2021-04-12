@@ -4,9 +4,36 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import {createStore, combineReducers} from "redux"
+import {Provider} from "react-redux"
+
+import {authorizationReducer} from "./9_Reducer_Auth"
+import {productReducer} from "./9_Reducer_products"
+
+import Axios from "axios"
+
+// Axios Config
+export const axios = Axios.create({
+  baseURL: "http://localhost:3001",
+  headers: {post: {"Content-Type": "application/json"}}
+  }
+);
+
+
+// Combine Reducers
+const reducer = combineReducers({
+  auth: authorizationReducer,
+  products: productReducer
+})
+
+// Create Store
+const store = createStore(reducer)
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
