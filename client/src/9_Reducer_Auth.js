@@ -2,8 +2,8 @@ import * as act from "./9.1_Actions"
 
 const initialState = {
 
-  username: "jeremy@miu.edu",
-  password: "1234",
+  username: "tekle@miu.edu",
+  password: "12345",
   currentUser: {username: "", role: ""}
 
 }
@@ -21,7 +21,8 @@ export function authorizationReducer(state = initialState, action) {
     // Login Fall Through for Testing
     case act.login: //????????
     case act.setUserInfo:
-      var data = {username: action.payload.username, role: action.payload.role}
+      // debugger
+      var data = {username: action.payload.email, role: action.payload.role}
       return {...state, currentUser: data}
      
     case act.logout:

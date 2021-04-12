@@ -17,6 +17,7 @@ const productRouter = require("./routes/products");
 const authenticateRouter = require("./routes/auth");
 const authorizeRouter = require("./MiddleWares/authorization");
 const superRouter = require("./routes/super");
+const cors = require("cors");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors())
 
 app.use("/", (req, res, next) => {
   if (!connection) {

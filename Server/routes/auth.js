@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwtManager = require("../JWT/jwtManager");
 const bcryptjs = require("bcryptjs");
+const {sendJSON, getReturnObject} = require("../MiddleWares/returnObject")
 
 router.post("/login", (req, res) => {
   // let hashedPassword = hash(req.body.password);
@@ -15,13 +16,16 @@ router.post("/login", (req, res) => {
         payload.email = data.email;
         payload.status = data.status;
         const token = jwtManager.generate(payload);
-        res.json({ status: "login Granted", result: token });
+
+        res.json(getReturnObject(null, token))
+        // res.json({ status: "login Granted", result: token });
       } else {
-        res.json({ status: "invalid User" });
+        // res.json({ status: "invalid User" });
+        res.json(getReturnObject("Invalid User", null))
       }
     })
     .catch((err) => {
-      res.json({ status: "Invalid User" });
+      res.json(getReturnObject("Invalid User", null))
     });
 });
 

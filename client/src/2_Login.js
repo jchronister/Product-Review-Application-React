@@ -23,7 +23,6 @@ export const Login = connect(
   // MapDispatchToProps
   dispatch => ({
     inputChange: ({target : {name, value}}) => dispatch(textboxChangeFx(name, value)),
-    loginTest: (user, role) => dispatch(loginFx(user, role)),
     login: (fx) => dispatch(fx)
   })
 
@@ -35,30 +34,27 @@ export const Login = connect(
 
     login = () => {
  
-      this.getAccount("login")
+      this.getAccount("/auth/login")
     }
 
     create = () => {
 
-      this.getAccount("create")
+      this.getAccount("/auth/signup")
     }
 
     // Request Server for Account Data
     getAccount = (path) => {
 
       // Required Data
-      const required = {username: "Username", password: "Password"}
+      const required = {email: "Username", password: "Password"}
       
       // Get User Input
-      const {username, password} = this.props
-      const info = {username, password}
+      const {username: email, password} = this.props
+      const info = {email, password}
 
       // Validate Data
       const missing = isMissing(Object.keys(required), info,required)
       if (missing) return alert(missing[1])
- 
-      // Account Setup for Testing ????????????????????
-      this.props.loginTest(username, "SuperUser")
 
       this.props.login( 
 
@@ -107,10 +103,10 @@ export const Login = connect(
                         {/* Username */}
                         <Textbox
                           name = "username"
-                          labelCaption = "User Name"
+                          labelCaption = "User Name "
                           value = {this.props.username}
                           onChange = {this.props.inputChange}
-                          placeholder="User Name"
+                          placeholder="Email"
                           // className="form-control"
                           // required = {true}
                         />

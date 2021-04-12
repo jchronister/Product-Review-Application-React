@@ -2,15 +2,19 @@ const express = require("express");
 const jwtManager = require("../JWT/jwtManager");
 const router = express.Router();
 
+const {sendJSON} = require("../MiddleWares/returnObject")
+
 // fetch all the products
 router.get("/", (req, res) => {
   req.db
     .collection("products")
     .find()
-    .toArray((err, data) => {
-      console.log(data);
-      res.status(200).json({ status: "success", result: data });
-    });
+    // .toArray((err, data) => {
+    //   console.log(data);
+    //   res.status(200).json({ status: "success", result: data });
+    // });
+    .toArray(sendJSON.bind(res))
+
 });
 
 router.get("/:id", (req, res) => {
