@@ -21,7 +21,8 @@ export const UpsertReview = connect (
       state = ({ 
                 // title: "",
                 comment: "",
-                rating: ""
+                rating: "",
+                oldRating: 0
               })
 
     formChange = ({target}) => this.setState({[target.name]: target.value})
@@ -30,12 +31,15 @@ export const UpsertReview = connect (
     submit = (e) => {
       e.preventDefault()
 
-      axiosRequest(axios.post("./reviews/" + this.props.match.params.id, {...this.state, rating: convertRating(this.state.rating)}),
+      // Review Id for Update
+      const reviewId = this.props.match.params.ReviewId
+debugger
+      axiosRequest(axios.post("./reviews/" + reviewId || this.props.match.params.id, {...this.state, rating: convertRating(this.state.rating)}),
         data => {
-          message(data, this.props.match.params.ReviewId ? "Review Updated" : "Review Added" )
+          message(data, reviewId ? "Review Updated" : "Review Added" )
           
           // Clear Textboxes on Successful Add
-          if (data.nModified && !this.props.match.params.ReviewId) this.setState({comment: "", rating: ""})
+          if (data.nModified && !reviewId) this.setState({comment: "", rating: ""})
         }
       )
 
@@ -46,8 +50,9 @@ export const UpsertReview = connect (
 
     // Get Current Review Data
     updateInfo = () => {
-      debugger
-      axiosRequest(axios.get("./reviews"),data => {this.replaceState(data.data)})
+      axiosRequest(axios.get("./reviews"), 
+        ({comment, rating}) => {this.replaceState({comment, rating: convertRating(rating), oldRating: rating})}
+      )
     }
 
 

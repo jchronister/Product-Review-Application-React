@@ -6,15 +6,19 @@ const {sendJSON} = require("../MiddleWares/returnObject")
 
 // fetch all the products
 router.get("/", (req, res) => {
+
+  // Sort Reputation
+  if (req.query.reputation) {
+    var sort = {reputation: req.query.reputation === "desc" ? -1 : 1}
+  } else {
+    sort = {}
+  }
+
   req.db
     .collection("products")
     .find()
-    // .toArray((err, data) => {
-    //   console.log(data);
-    //   res.status(200).json({ status: "success", result: data });
-    // });
+    .sort(sort)
     .toArray(sendJSON.bind(res))
-
 });
 
 router.get("/:id", (req, res) => {

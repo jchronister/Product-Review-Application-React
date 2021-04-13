@@ -4,6 +4,10 @@ import {XButton, FormTextbox} from "./zComponents"
 
 import {productTextboxChangeFx, productClearTextboxFx} from "./9.1_Actions"
 
+import "./3_Products.css"
+import {axiosRequest} from "./zFx"
+import {axios} from "./index"
+
 // Display Products List Component
 export const Products = connect (
 
@@ -22,6 +26,8 @@ export const Products = connect (
   // Product List Component
   class extends Component { 
 
+    state = {sort: ""}
+
     // Add Review Button
     addReview = ({target}) => {
       this.props.history.push("/products/" + this.getId(target) + "/create-review")
@@ -38,10 +44,28 @@ export const Products = connect (
       while (el && !el.dataset.id) el = el.parentElement
       return el && el.dataset.id
     }
+    sort = ({target}) => {
+
+      // Sort Table
+      const direction = this.state.sort === "asc" ? "desc" : "asc"
+      
+      // Adjust Classes
+      target.classList.remove(direction === "desc" ? "asc" : "desc")
+      target.classList.add(direction)
+  
+      // Set State
+      this.setState({sort: direction})
+
+      // Request Data
+      axiosRequest(axios.get("/products?reputation=" + direction), 
+        data => {
+          // setState ???????????????
+        }
+      )      
+    }
 
     render () {
 
-      const header = true // Show Product Table Header
       const {products, user, fieldList} = this.props // Product Field List to Show {Field Key: Field Name}
       const fields = Object.keys(fieldList)
       const creator = "creator" // Product Creator Key
@@ -62,7 +86,8 @@ export const Products = connect (
 
           {/* Add Header */}
           <thead>
-          {header && <tr>{fields.map((n, i) => <th key={i}>{fieldList[n]}</th>)}<td></td><td></td></tr>}
+          {/* {header && <tr>{fields.map((n, i) => <th key={i} className="asc">{fieldList[n]}</th>)}</tr> */}
+          <tr><th>Image</th><th>Title</th><th>Description</th><th className="sort desc" onClick={this.sort}>Rating</th><th></th><th></th></tr>
           </thead>
 
           {/* Add Rows */}
