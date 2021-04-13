@@ -1,0 +1,1 @@
+db.products.updateOne({"_id" : ObjectId("6070fba9132e0e9bf707417e")}, {$set: {reputation: {$sum: "$reviews.rating"}}})

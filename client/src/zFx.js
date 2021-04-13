@@ -87,3 +87,28 @@ export function isMissing(aryRequired, objValues, aryRename) {
   // Return Empty String for All Data Present
   return "";
 };
+
+
+
+/** Returns Attribute Stored in element.data.[attribute]
+*   Checks Parent Element if Not Found.
+* @param {element} element Child Element
+* @param {string} attribute Data Attribute to Retrieve
+* @returns {string} attribute or null
+*/
+export function getDataAttribute (element, attribute) {
+  let el = element
+  while (el && !el.dataset[attribute]) el = el.parentElement
+  return el && el.dataset[attribute]
+}
+
+
+
+// Show Response Message
+export function message (data, success) {
+  if (data.nModified === 1) {
+    alert(success)
+  } else {
+    alert(JSON.stringify(data, null, 2))
+  }
+}

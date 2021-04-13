@@ -1,7 +1,8 @@
 import {XButton, FormTextbox, FormRadio} from "./zComponents"
-import React, {Component} from "react"
+import React, {Component, useState} from "react"
 import {connect} from "react-redux"
-
+import {axiosRequest, message} from "./zFx"
+import {axios} from "./index"
 
 
 export const UpsertReview = connect (
@@ -17,11 +18,11 @@ export const UpsertReview = connect (
   // Upsert Review Component
   class extends Component {
 
-    state = { 
-              title: "",
-              comment: "",
-              rating: ""
-            }
+      state = ({ 
+                // title: "",
+                comment: "",
+                rating: ""
+              })
 
     formChange = ({target}) => this.setState({[target.name]: target.value})
 
@@ -29,32 +30,48 @@ export const UpsertReview = connect (
     submit = (e) => {
       e.preventDefault()
 
-      // Fetch Here
-      alert (JSON.stringify(this.state))
+      axiosRequest(axios.post("./reviews/" + this.props.match.params.id, {...this.state, rating: convertRating(this.state.rating)}),
+        data => {
+          message(data, this.props.match.params.ReviewId ? "Review Updated" : "Review Added" )
+          
+          // Clear Textboxes on Successful Add
+          if (data.nModified && !this.props.match.params.ReviewId) this.setState({comment: "", rating: ""})
+        }
+      )
 
     }
 
     // Cancel Button
     cancel = () => this.props.history.goBack()
 
+    // Get Current Review Data
+    updateInfo = () => {
+      debugger
+      axiosRequest(axios.get("./reviews"),data => {this.replaceState(data.data)})
+    }
+
+
     render () {
+
+      // Add or Edit Mode
+      const add = this.props.match.path === "/products/:id/create-review"
 
       return (
 
           <div className="container">
             <br/>
 
-            <h2>Create Product Review</h2>
+            <h2>{add ? "Create Product Review" : "Update Product Review"}</h2>
             
             <form className="form-horizontal" onSubmit={this.submit}>
 
               {/* Title */}
-              <FormTextbox
+              {/* <FormTextbox
                 title = "Title"
                 name = "title"
                 value = {this.state.title}
                 onChange = {this.formChange}
-              />
+              /> */}
 
               {/* Comment */}
               <FormTextbox
@@ -111,7 +128,7 @@ export const UpsertReview = connect (
                   />  
 
                   <XButton
-                    title = "Add Review"
+                    title = {add ? "Add Review" : "Update Review"}
                     type = "Submit"
                   />  
                 </div>
@@ -122,3 +139,16 @@ export const UpsertReview = connect (
     }
   }
 )
+
+// Get Rating
+function convertRating (rating) { 
+
+  const ratings = [ "Excellent", "2", "Excellent", 
+                    "Good", "0", "Good", 
+                    "Bad", "-1", "Bad"]      
+
+  const rate = ratings[ratings.indexOf("" + rating) + 1]
+
+  return isNaN(+rate) ? rate : +rate
+
+}

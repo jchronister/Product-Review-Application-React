@@ -8,6 +8,7 @@ import {UserAccounts, ServerLog} from "./5_SuperUser"
 import {connect} from "react-redux"
 import {XButton} from "./zComponents"
 import {logoutFx} from "./9.1_Actions"
+import {axios} from "./index"
 
 export const MainRouter = connect(
 
@@ -52,7 +53,7 @@ export const MainRouter = connect(
       }
 
       {/* Show Super User Dashboard */}
-      {role === "SuperUser" &&
+      {role === "superuser" &&
         <div>
         <h4>Super User Dashboard</h4>
         <ul>
@@ -85,7 +86,7 @@ export const MainRouter = connect(
         <Route path="/serverlog" exact component={ServerLog}/>
         <Route path="/products/:id/create-review" exact component={UpsertReview}/>
                                 
-        <Route path="/products/:id/reviews/:id" exact component={UpsertReview}/>
+        <Route path="/products/:id/reviews/:ReviewId" exact component={UpsertReview}/>
         
 
       </Switch>
@@ -115,6 +116,10 @@ function LoginStatus ({role, username, logout}) {
                   title="Logout" 
                   onClick={()=> {
                     logout()
+
+                    // Clear Axios Token
+                    delete axios.defaults.headers.common['Authorization'];
+
                     history.push("/login")
                   }}
                 />

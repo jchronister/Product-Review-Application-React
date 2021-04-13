@@ -10,7 +10,13 @@ router.post("/login", (req, res) => {
     .collection("users")
     .findOne({ email: req.body.email })
     .then((data) => {
-      if (data.password === req.body.password) {
+      if (!data) {
+        res.json(getReturnObject("Invalid Username", null))
+
+      } else if (data.status !== "active") {
+        res.json(getReturnObject("User Inactive", null))
+
+      } else if (data.password === req.body.password) {
         const payload = {};
         payload.role = data.role;
         payload.email = data.email;
@@ -21,7 +27,7 @@ router.post("/login", (req, res) => {
         // res.json({ status: "login Granted", result: token });
       } else {
         // res.json({ status: "invalid User" });
-        res.json(getReturnObject("Invalid User", null))
+        res.json(getReturnObject("Invalid Password", null))
       }
     })
     .catch((err) => {
@@ -35,17 +41,27 @@ router.post("/signup", (req, res) => {
     .findOne({ email: req.body.email })
     .then((data) => {
       if (data) {
-        res.json({ status: "User already exist" });
+        res.json(getReturnObject("User Already Exists", null))
+        // res.json({ status: "User already exist" });
       } else {
+
+        // User Object to Add
+        const user = {
+            email : req.body.email,
+            password : req.body.password,
+            role : "user",
+            status : "active"
+        }
+
         req.db
           .collection("users")
-          .insertOne(req.body)
-          .then((data) => {
-            res.json({ status: "succesfully Added User", result: data });
-          })
-          .catch((err) => {
-            res.json({ status: "error occured while trying to add you" });
-          });
+          .insertOne(user, sendJSON.bind(res))
+          // .then((data) => {
+          //   res.json({ status: "succesfully Added User", result: data });
+          // })
+          // .catch((err) => {
+          //   res.json({ status: "error occured while trying to add you" });
+          // });
       }
     });
 });

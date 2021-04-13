@@ -3,28 +3,41 @@ const { ObjectID } = require("mongodb");
 const { token } = require("morgan");
 const router = express.Router();
 const jwtManager = require("../JWT/jwtManager");
-
+const {sendJSON} = require("../MiddleWares/returnObject")
 
 // add review to the product
-router.post("/:id", (req, res) => {
+router.post("/:id", (req, res, next) => {
   const headers = req.headers.authorization;
   const token = jwtManager.verify(headers);
   let addReviews = {
     creator: token.email,
     reviewID: new ObjectID(),
     comment: req.body.comment,
-    rating: req.body.rating,
+    rating: +req.body.rating,
     creationDate: new Date(),
   };
-  req.db
-    .collection("products")
-    .update(
-      { _id: new ObjectID(req.params.id) },
-      { $push: { reviews: addReviews } }
-    )
-    .then((data) => {
-      res.json({ status: "review succesfully posted", result: data });
-    });
+
+  // Get Array Sum
+  req.db.collection("products").aggregate([{$match: {"_id" : ObjectID(req.params.id)}}, {$project: {total:{$sum: "$reviews.rating"}}}])
+
+  .toArray().then(
+
+    (data) => {
+
+      console.log(data[0].total)
+
+      // Update Product Review and Reputation
+      req.db.collection("products")
+      .updateOne(
+        { _id: new ObjectID(req.params.id) },
+        { $push: { reviews: addReviews }, $set: {reputation: data[0].total + addReviews.rating}},
+        sendJSON.bind(res)
+      )
+
+    }
+  ).catch(next)
+
+
 });
 
 // edit reviews of the product
@@ -34,7 +47,7 @@ router.put("/:id", (req, res) => {
 
   req.db
     .collection("products")
-    .update(
+    .updateOne(
       {
         "reviews.creator": token.email,
         reviews: { $elemMatch: { reviewID: new ObjectID(req.params.id) } },
@@ -44,17 +57,9 @@ router.put("/:id", (req, res) => {
           "reviews.$.comment": req.body.comment,
           "reviews.$.rating": req.body.rating,
         },
-      }
+      },
+      sendJSON.bind(res)
     )
-    .then((data) => {
-      res.json({
-        status: "you have succesfully updated your review",
-        result: data,
-      });
-    })
-    .catch((err) => {
-      res.json({ status: "Sorry you can't update the review" });
-    });
 });
 
 router.delete("/:id", (req, res) => {
@@ -63,13 +68,12 @@ router.delete("/:id", (req, res) => {
 
   req.db
     .collection("products")
-    .update(
+    .updateOne(
       { "reviews.creator": token.email },
-      { $pull: { reviews: { reviewID: new ObjectID(req.params.id) } } }
+      { $pull: { reviews: { reviewID: new ObjectID(req.params.id) } } },
+      sendJSON.bind(res)
     )
-    .then((data) => {
-      res.json({ status: "succesfully removed the product" });
-    });
+
 });
 
 module.exports = router;

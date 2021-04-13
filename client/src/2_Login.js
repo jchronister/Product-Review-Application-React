@@ -65,6 +65,9 @@ export const Login = connect(
               // Login Callback Function
               data => {
 
+                // Server Not Setup to Handle Add & Login at Same Time
+                if (!data.data) return alert("User Successfully Added. Please Login")
+
                 // Set Axios Token
                 axios.defaults.headers.common['Authorization'] = data.data;
 

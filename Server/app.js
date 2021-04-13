@@ -18,6 +18,11 @@ const authenticateRouter = require("./routes/auth");
 const authorizeRouter = require("./MiddleWares/authorization");
 const superRouter = require("./routes/super");
 const cors = require("cors");
+const {getReturnObject} = require("./MiddleWares/returnObject")
+const fs = require("fs")
+
+// Setup process.env from .env File
+// require('dotenv').config();
 
 const app = express();
 
@@ -31,6 +36,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors())
+
+// Log All Requests Date/Method/Path/IP
+let logIt = fs.createWriteStream("./logs/access.log",{flags:"a"});
+app.use(logger('* [:date[clf]] :method :url HTTP/:http-version :referrer', {stream: logIt}));
 
 app.use("/", (req, res, next) => {
   if (!connection) {
@@ -47,14 +56,15 @@ app.use("/", (req, res, next) => {
 app.use(authorizeRouter.givePermission);
 
 app.use("/", indexRouter);
-app.use("/review", usersRouter);
+app.use("/reviews", usersRouter);
 app.use("/products", productRouter);
 app.use("/auth", authenticateRouter);
 app.use("/super", authorizeRouter.isSuper,superRouter);
 
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  next(createError(404, "URL Not Found"));
 });
 
 // error handler
@@ -64,8 +74,8 @@ app.use(function (err, req, res, next) {
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+  res.status(err.status || 500).json(getReturnObject(err.message || err, null));
+  // res.render('error');
 });
 
 const port = process.env.PORT || 3001;
