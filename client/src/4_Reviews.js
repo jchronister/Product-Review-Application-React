@@ -40,7 +40,7 @@ export const UpsertReview = connect (
       if (reviewId) {
         var request = axios.put("./reviews/" + reviewId, info)
       } else {
-        request = axios.put("./reviews/" + this.props.match.params.id, info)
+        request = axios.post("./reviews/" + this.props.match.params.id, info)
       } 
 
       // Linkup Request
@@ -51,7 +51,7 @@ export const UpsertReview = connect (
           
           // Clear Textboxes on Successful Add
           // if (data.nModified && !reviewId) this.setState({comment: "", rating: ""})
-          
+
           // Got to Previous Page on Success
           if (data.nModified) this.props.history.goBack()
         }

@@ -49,14 +49,14 @@ router.put("/:id", (req, res) => {
     .collection("products")
     .updateOne(
       {
-        "reviews.creator": token.email,
-        reviews: { $elemMatch: { reviewID: new ObjectID(req.params.id) } },
+        "reviews.reviewID":  new ObjectID(req.params.id) 
       },
       {
         $set: {
           "reviews.$.comment": req.body.comment,
-          "reviews.$.rating": req.body.rating,
+          "reviews.$.rating": req.body.rating
         },
+          "$inc" :{ reputation: req.body.rating - req.body.oldRating}
       },
       sendJSON.bind(res)
     )
