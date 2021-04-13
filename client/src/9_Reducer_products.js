@@ -30,7 +30,11 @@ export function productReducer (state = initialState, action) {
 
     case act.productClearTextbox:
       data = Object.keys(state.upsertProduct).reduce((a, n) => ({...a, [n]: ""}), {})
-      return {...state, upsertProduct: data}      
+      return {...state, upsertProduct: data}   
+      
+      case act.updateProduct:
+       return {...state, products: action.payload}
+        
 
     default:
 

@@ -32,3 +32,6 @@ export const setUserInfoFx = (data) => action(setUserInfo, data)
 
 export const updateUserList = "updateUserList"
 export const updateUserListFx = (data) => action(updateUserList, data)
+
+export const updateProduct = "updateProductList"
+export const updateProductFx = (data) =>action(updateProduct, data)
