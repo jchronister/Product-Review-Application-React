@@ -37,7 +37,9 @@ export const Products = connect (
     state = {sort: ""}
 
     componentDidMount(){
+
       this.props.getProductData(this.getData)
+      
     }
 
     getData = (dispatch)=>{
@@ -279,31 +281,18 @@ export const ProductDetails = connect(
 
 
 // Add & Update Products
-export const UpsertProduct = connect (
+
 
   // Map State to Props
-  state => ({
-    user: state.auth.currentUser.username,
-    fields: state.products.setup.upsertProductFields,
-    title: state.products.upsertProduct.title,
-    description: state.products.upsertProduct.description
-  }),
-
-  // Map Dispatch to Props
-  dispatch => ({
-    addProduct: (data) => dispatch(),
-    updateTextbox: ({target}) => dispatch(productTextboxChangeFx(target.name, target.value)),
-    clearTextbox: () => dispatch(productClearTextboxFx())
-  })
-
-)(
+  
 
   // UpsertProduct Component
-  class extends Component {
+  class InsertProduct extends Component {
 
 
-    componentDidMount () {
+    componentDidMount(){
 
+      this.props.newProductData(insertData)
 
     }
 
@@ -401,5 +390,54 @@ export const UpsertProduct = connect (
 
     }
 
+  
+}
+
+// state => ({
+//   user: state.auth.currentUser.username,
+//   fields: state.products.setup.upsertProductFields,
+//   title: state.products.upsertProduct.title,
+//   description: state.products.upsertProduct.description
+// }),
+
+// // Map Dispatch to Props
+// dispatch => ({
+//   addProduct: (data) => dispatch(),
+//   updateTextbox: ({target}) => dispatch(productTextboxChangeFx(target.name, target.value)),
+//   clearTextbox: () => dispatch(productClearTextboxFx())
+// })
+
+// )(
+
+
+  const productInsertStateProps = (state)=>{
+    return{
+      user: state.auth.currentUser.username,
+      fields: state.products.setup.upsertProductFields,
+      title: state.products.upsertProduct.title,
+      description: state.products.upsertProduct.description
+    }
   }
-)
+
+  const productInsertDispachProps = (dispatch)=>{
+    return{
+      newProductData: (data)=>{
+        return dispatch({
+          addProduct: (data) => dispatch(),
+          updateTextbox: ({target}) => dispatch(productTextboxChangeFx(target.name, target.value)),
+          clearTextbox: () => dispatch(productClearTextboxFx())
+        })
+      }
+    }
+  }
+
+  const insertData = (dispatch)=>{
+    axios.post('/create-products')
+    .then(response =>{
+      // debugger
+      return dispatch(productTextboxChangeFx(response.data.data))
+    })
+  }
+
+
+export const UpsertProduct = connect(productInsertStateProps, productInsertDispachProps)(InsertProduct)

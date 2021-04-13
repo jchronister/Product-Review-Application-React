@@ -35,9 +35,7 @@ export function productReducer (state = initialState, action) {
       case act.updateProduct:
        return {...state, products: action.payload}
         
-
     default:
-
 
   }
 
