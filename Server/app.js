@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors())
 
 // Log All Requests Date/Method/Path/IP
-let logIt = fs.createWriteStream("./logs/access.log",{flags:"a"});
+let logIt = fs.createWriteStream("./access.log",{flags:"a"});
 app.use(logger('* [:date[clf]] :method :url HTTP/:http-version :referrer', {stream: logIt}));
 
 app.use("/", (req, res, next) => {
