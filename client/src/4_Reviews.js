@@ -33,13 +33,27 @@ export const UpsertReview = connect (
 
       // Review Id for Update
       const reviewId = this.props.match.params.ReviewId
-debugger
-      axiosRequest(axios.post("./reviews/" + reviewId || this.props.match.params.id, {...this.state, rating: convertRating(this.state.rating)}),
+
+      const info = {...this.state, rating: convertRating(this.state.rating)}
+
+      // Method for Request
+      if (reviewId) {
+        var request = axios.put("./reviews/" + reviewId, info)
+      } else {
+        request = axios.put("./reviews/" + this.props.match.params.id, info)
+      } 
+
+      // Linkup Request
+      axiosRequest(request, 
+
         data => {
           message(data, reviewId ? "Review Updated" : "Review Added" )
           
           // Clear Textboxes on Successful Add
-          if (data.nModified && !reviewId) this.setState({comment: "", rating: ""})
+          // if (data.nModified && !reviewId) this.setState({comment: "", rating: ""})
+          
+          // Got to Previous Page on Success
+          if (data.nModified) this.props.history.goBack()
         }
       )
 
@@ -49,15 +63,25 @@ debugger
     cancel = () => this.props.history.goBack()
 
     // Get Current Review Data
-    updateInfo = () => {
-      axiosRequest(axios.get("./reviews"), 
-        ({comment, rating}) => {this.replaceState({comment, rating: convertRating(rating), oldRating: rating})}
+    updateInfo = (reviewId) => {
+      axiosRequest(axios.get("./reviews/" + reviewId), 
+        (data) => {
+          let {comment, rating} = data.data[0].reviews[0]
+          this.setState({comment, rating: convertRating(rating), oldRating: rating})}
       )
     }
 
+    componentDidMount () {
+
+      const reviewId = this.props.match.params.ReviewId
+
+      // Request Data for Review Id if Exists
+      if (reviewId) this.updateInfo(reviewId)
+
+    }
 
     render () {
-
+// debugger
       // Add or Edit Mode
       const add = this.props.match.path === "/products/:id/create-review"
 
@@ -145,8 +169,12 @@ debugger
   }
 )
 
-// Get Rating
-function convertRating (rating) { 
+
+/**   Converts Rating to Number or Number to Rating 
+*     @param {string || number} rating - Rating
+*     @returns {string || number} - Rating
+*/
+export function convertRating (rating) { 
 
   const ratings = [ "Excellent", "2", "Excellent", 
                     "Good", "0", "Good", 

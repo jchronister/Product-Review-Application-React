@@ -42,3 +42,8 @@
   border-top: 5px solid #333;
   border-bottom: 5px solid transparent;
 }
+
+td.details:hover {
+  cursor: pointer;
+  color: red;
+}

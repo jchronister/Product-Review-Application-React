@@ -2,11 +2,12 @@ import {Component} from "react"
 import {connect} from "react-redux"
 import {XButton, FormTextbox} from "./zComponents"
 
-import {productTextboxChangeFx, productClearTextboxFx, updateProductFx} from "./9.1_Actions"
+import {productTextboxChangeFx, productClearTextboxFx, updateProductFx, getDBDataFx, updateProductDetail} from "./9.1_Actions"
 
 import "./3_Products.css"
-import {axiosRequest} from "./zFx"
+import {axiosRequest, getDataAttribute, message} from "./zFx"
 import {axios} from "./index"
+import {convertRating} from "./4_Reviews"
 
 // Display Products List Component
 export const Products = connect (
@@ -126,7 +127,7 @@ export const Products = connect (
           <tr key={product[id]} data-id={product[id]}>
 
             {/* Add Columns/Cells */}
-            {fields.map((n, i)=><td key={product[id] + i} data-id={product[id]}>{product[n]}</td>)}
+            {fields.map((n, i)=><td key={product[id] + i} data-id={product[id]} className="details">{product[n]}</td>)}
 
             {/* Add Review Button */}
             <td><XButton
@@ -145,7 +146,17 @@ export const Products = connect (
                 />
               }
             </td>           
-            
+            {/* Add Delete Button if User Created*/}
+            <td>
+              {user === product[creator] && 
+                <XButton
+                  title ="Delete Product"
+                  className = "btn btn-secondary"
+                  onClick = {this.editProduct}
+                />
+              }
+            </td>    
+
           </tr>
         ))}
 
@@ -165,50 +176,60 @@ export const ProductDetails = connect(
   // MapStateToProps
   state => ({
     user: state.auth.currentUser.username,
+    details: state.products.detail
   }), 
 
   // MapDispatchToProps
-  null
+  dispatch => ({
+    getData: (path, reducer) => dispatch(getDBDataFx(path, reducer))
+  })
 
 )(
 
   // Product Details Component
   class ProductDetails extends Component{
 
-    state = {
-      rating:null ,
-      description:"A Outdoor Wonder Water Bottle",
-      details: {size:"1 Liter", width: "3 inches", height: "12 inches"},
-      reviews:[
-        {
-          id:1,
-        creator: "jrc",
-        rating: 2,
-        title:"great bottle",
-        comment:"This is awesome",
-        creationDate: new Date()
-        },
-        {
-          id:2, 
-        creator: "tekle",
-        rating: 0,
-        creationDate: new Date(),
-        comment: "Ive Seen Better",
-        title:"fell apart"
-        }
-        ]
-
+ 
+    // Edit Review for Item
+    editReview = ({target}) => {
+      this.props.history.push("/products/" + this.props.match.params.id + "/reviews/" + getDataAttribute(target, "id"))
     }
-
-    editReview = () => {}
 
     // Add Review for Item
     addReview = () => {
       this.props.history.push("/products/" + this.props.match.params.id + "/create-review")
     }
+
+    // Delete
+    deleteReview = ({target}) => {
+
+      // Get Id and Delete
+      axiosRequest(axios.delete("./reviews/" + getDataAttribute(target, "id")),
+
+        // Alert Message
+        data => message(data, "Review Deleted" ),
+
+        // Refresh
+        () => this.props.getData("/products/" + this.props.match.params.id, updateProductDetail)
+
+      )
+        
+    }
+
+    componentDidMount () {
+      // Get Product Detail Data from Database
+      this.props.getData("/products/" + this.props.match.params.id, updateProductDetail)
+    }
+
     render () {
 
-      const {reviews, description, details, rating, currentUser} = this.state
+      const {details, user: currentUser} = this.props
+
+      if (!details.description) return <h2>.... Fetching Product Details</h2>
+  
+      const {reviews, description, reputation} = details
+
+      
 
       return (
         <div>
@@ -216,44 +237,52 @@ export const ProductDetails = connect(
           <h2>Product Details & Reviews</h2>
 
           {/* Product Picture and Description */}
-          <img alt="Product"/>
-          <h2>{description || "Product Description"}</h2>
+          {/* <img alt="Product"/> */}
+          <h4>Description: {description}</h4>
           
           {/* Reputation with Button to Add if None */}
-          <h2>Reputation: {rating === null 
+          <h4>Reputation Score: {reputation === null 
             ? <XButton 
                 title="Rate Product"
                 onClick = {this.addReview}
               />
-            : rating}</h2>
+            : reputation}</h4>
 
           {/* Product Details */}
-          <h2>{"Product Details"}</h2>
-          {Object.entries(details).map(([key, value]) => <p key={key}>{key}: {value}</p>)}
+          {/* <h2>{"Product Details"}</h2>
+          {Object.entries(details).map(([key, value]) => <p key={key}>{key}: {value}</p>)} */}
 
           {/* Reviews Section with Button to Add Review*/}
-          <h2>Reviews: {rating || "Be the First to Review"}  
+          <h4>Reviews: {reputation !== null ? "" : "Be the First to Review"}  
           <XButton 
             title="Create Review"
             onClick = {this.addReview}
           />
-          </h2>
+          </h4>
 
           {/* Show Reviews Table*/}
-          {reviews.length
+          {reviews && reviews.length
 
-          ? <table><tbody>
+          ? <table className="table table-hover"><tbody>
               {reviews.map(review => ([
                 
                   // Rating, Creator, Date, Edit Button
-                  <tr key ={review.id + "1"}> 
-                    <td>Rating: {review.rating}</td>
+                  <tr key ={review.id + "1"} data-id={review.reviewID}> 
+                    <td>Rating: {convertRating(review.rating)}</td>
                     <td>User: {review.creator}</td>
-                    <td>{review.creationDate.toString()}</td>
+                    <td>{review.creationDate && review.creationDate.toString()}</td>
                     <td>{currentUser === review.creator
                           ? <XButton
-                              title="Edit Review"
-                              
+                              title="Edit"
+                              onClick = {this.editReview}
+                            />
+                          : ""
+                        }
+                    </td>
+                    <td>{currentUser === review.creator
+                          ? <XButton
+                              title="Delete"
+                              onClick = {this.deleteReview}
                             />
                           : ""
                         }
@@ -261,13 +290,13 @@ export const ProductDetails = connect(
                   </tr>,
 
                   <tr key ={review.id + "2"}>
-                    <td  colSpan="4">{review.comment}</td>
+                    <td></td><td  colSpan="3">{review.comment}</td>
                   </tr>
                 
               ]))} 
             </tbody></table>
           
-          : <h2>No Reviews</h2>
+          : <h4>No Reviews</h4>
 
           }
 

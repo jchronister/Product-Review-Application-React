@@ -3,7 +3,7 @@ import * as act from "./9.1_Actions"
 const initialState = {
 
   // products: [],
-
+  detail: {},
   upsertProduct: {title: "", description: ""},
   upsertReview: {title: "", comment: "", rating: ""},
   
@@ -32,9 +32,11 @@ export function productReducer (state = initialState, action) {
       data = Object.keys(state.upsertProduct).reduce((a, n) => ({...a, [n]: ""}), {})
       return {...state, upsertProduct: data}   
       
-      case act.updateProduct:
-       return {...state, products: action.payload}
-        
+    case act.updateProduct:
+      return {...state, products: action.payload}
+      
+    case act.updateProductDetail:
+      return {...state, detail: action.payload[0]}
 
     default:
 

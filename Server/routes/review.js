@@ -65,15 +65,30 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   const headres = req.headers.authorization;
   const token = jwtManager.verify(headres);
+  const id = ObjectID(req.params.id)
 
   req.db
     .collection("products")
     .updateOne(
-      { "reviews.creator": token.email },
-      { $pull: { reviews: { reviewID: new ObjectID(req.params.id) } } },
+      // { "reviews.creator": token.email },
+      {"reviews.reviewID": id},
+      { $pull:  { reviews: { reviewID: id } } },
       sendJSON.bind(res)
     )
 
 });
+
+// Get Review
+router.get("/:id", (req, res) => {
+const id = ObjectID(req.params.id)
+  req.db.collection("products")
+//   .aggregate([{$match:{"reviews.reviewID": ObjectID(req.params.id)}},
+// {$project: {comment: "$reviews.$.comment", rating: "$reviews.$.rating"}}])
+  .find({"reviews.reviewID": id},
+  {projection: {_id: 0, reviews: {$elemMatch: {reviewID: id}}}})
+  .toArray(sendJSON.bind(res))
+
+})
+
 
 module.exports = router;

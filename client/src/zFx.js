@@ -25,7 +25,7 @@ export function axiosRequest (axiosReq, ...thenFx) {
   // Handle Errors
   .catch(err => {
 
-// debugger
+debugger
 
     if (err.response && err.response.data && err.response.data.error) {
 

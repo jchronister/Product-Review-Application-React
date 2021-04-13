@@ -1,7 +1,7 @@
 const express = require("express");
 const jwtManager = require("../JWT/jwtManager");
 const router = express.Router();
-
+const {ObjectID} = require("mongodb")
 const {sendJSON} = require("../MiddleWares/returnObject")
 
 // fetch all the products
@@ -18,17 +18,14 @@ router.get("/", (req, res) => {
     .collection("products")
     .find()
     .sort(sort)
-    .toArray(sendJSON.bind(res))
+    .toArray(sendJSON.bind(res));
 });
 
 router.get("/:id", (req, res) => {
   req.db
     .collection("products")
     .find({ _id: new ObjectID(req.params.id) })
-    .toArray((err, data) => {
-      console.log(data);
-      res.status(200).json({ status: "success", result: data });
-    });
+    .toArray(sendJSON.bind(res));
 });
 
 
@@ -37,7 +34,7 @@ router.post("/", (req, res) => {
   const headers = req.headers.authorization;
   let token = jwtManager.verify(headers);
   let newProduct = {
-    reputation: 0,
+    reputation: null,
     review: [],
     creator: token.email,
     creationDate: new Date(),

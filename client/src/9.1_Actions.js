@@ -1,4 +1,5 @@
-
+import {axiosRequest} from "./zFx"
+import {axios} from "./index"
 
 
 function action (type, payload) {
@@ -35,3 +36,16 @@ export const updateUserListFx = (data) => action(updateUserList, data)
 
 export const updateProduct = "updateProductList"
 export const updateProductFx = (data) =>action(updateProduct, data)
+
+
+export const updateProductDetail = "updateProductDetail"
+
+
+// Get Database Data and Update State
+export const getDBDataFx = (path, reducer) => {
+
+  return function (dispatch) {
+    axiosRequest(axios.get(path), data => dispatch(action(reducer, data.data)))
+  }
+
+}
