@@ -40,6 +40,9 @@ export const updateProductFx = (data) =>action(updateProduct, data)
 
 export const updateProductDetail = "updateProductDetail"
 
+export const updateProductInfo = "updateProductInfo"
+export const updateProductInfoFx = (data) =>action(updateProductInfo, data)
+
 
 // Get Database Data and Update State
 export const getDBDataFx = (path, reducer) => {

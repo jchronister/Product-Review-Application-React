@@ -72,7 +72,8 @@ router.delete("/:id", (req, res) => {
     .updateOne(
       // { "reviews.creator": token.email },
       {"reviews.reviewID": id},
-      { $pull:  { reviews: { reviewID: id } } },
+      { $pull:  { reviews: { reviewID: id } },
+      "$inc" :{ reputation: req.body.rating - req.body.oldRating} },
       sendJSON.bind(res)
     )
 

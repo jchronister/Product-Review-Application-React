@@ -34,6 +34,7 @@ router.post("/", (req, res) => {
   const headers = req.headers.authorization;
   let token = jwtManager.verify(headers);
   let newProduct = {
+    title: req.body.title,
     reputation: null,
     review: [],
     creator: token.email,
@@ -41,36 +42,37 @@ router.post("/", (req, res) => {
     description: req.body.description,
     img: req.body.img,
   };
-  console.log(newProduct);
+
   req.db
     .collection("products")
-    .insertOne(newProduct)
-    .then((data) => {
-      res.json({ status: "succesfully added product", result: data });
-    })
-    .catch((err) => {
-      res.json({ status: "error" });
-    });
+    .insertOne(newProduct, sendJSON.bind(res))
+    // .then((data) => {
+    //   res.json({ status: "succesfully added product", result: data });
+    // })
+    // .catch((err) => {
+    //   res.json({ status: "error" });
+    // });
 });
 
 
 // update product
 router.put("/:id", (req, res) => {
+
   const headers = req.headers.authorization;
   let token = jwtManager.verify(headers);
   req.db
     .collection("products")
     .updateOne(
-      { creator: token.email },
-      { $set: { description: req.body.description, img: req.body.img } }
-    )
-    .then((data) => {
-      res.json({ status: "succesfully updated the product" });
-    })
+      { _id: new ObjectID(req.params.id) },
+      { $set: { title: req.body.title, description: req.body.description, img: req.body.img } }
+    ,sendJSON.bind(res))
+    // .then((data) => {
+    //   res.json({ status: "succesfully updated the product" });
+    // })
 
-    .catch((err) => {
-      res.json({ status: "error can't update product", result: err });
-    });
+    // .catch((err) => {
+    //   res.json({ status: "error can't update product", result: err });
+    // });
 });
 
 
@@ -80,13 +82,9 @@ router.delete("/:id", (req, res) => {
   let token = jwtManager.verify(headers);
   req.db
     .collection("products")
-    .removeOne({ creator: token.email })
-    .then((data) => {
-      res.json({ status: "successfully removed product" });
-    })
-    .catch((err) => {
-      res.json({ status: "error", result: err });
-    });
+    .deleteOne({ creator: token.email, _id: new ObjectID(req.params.id)  },
+    sendJSON.bind(res))
+
 });
 
 module.exports = router;

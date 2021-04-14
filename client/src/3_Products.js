@@ -2,7 +2,7 @@ import {Component} from "react"
 import {connect} from "react-redux"
 import {XButton, FormTextbox} from "./zComponents"
 
-import {productTextboxChangeFx, productClearTextboxFx, updateProductFx, getDBDataFx, updateProductDetail} from "./9.1_Actions"
+import {productTextboxChangeFx, updateProductInfoFx, productClearTextboxFx, updateProductFx, getDBDataFx, updateProductDetail} from "./9.1_Actions"
 
 import "./3_Products.css"
 import {axiosRequest, getDataAttribute, message} from "./zFx"
@@ -52,6 +52,19 @@ export const Products = connect (
       })
     }
 
+    // Delete Button
+    deleteProduct = ({target}) => {
+
+      // Delete Request
+      axiosRequest(axios.delete("./products/" + this.getId(target)), 
+        data => message(data, "Product Deleted" ),
+
+        // Refresh
+        () => this.props.getProductData(this.getData)
+      )
+
+    }
+
     // Add Review Button
     addReview = ({target}) => {
       this.props.history.push("/products/" + this.getId(target) + "/create-review")
@@ -68,6 +81,7 @@ export const Products = connect (
       while (el && !el.dataset.id) el = el.parentElement
       return el && el.dataset.id
     }
+
     sort = ({target}) => {
 
       // Sort Table
@@ -154,7 +168,7 @@ export const Products = connect (
                 <XButton
                   title ="Delete Product"
                   className = "btn btn-secondary"
-                  onClick = {this.editProduct}
+                  onClick = {this.deleteProduct}
                 />
               }
             </td>    
@@ -321,20 +335,27 @@ export const ProductDetails = connect(
 
     componentDidMount(){
 
-      this.props.newProductData(insertData)
+      // Only Retrieve Data for Edit Not Add
+      if (this.props.match.params.id) {
+
+        this.props.addProduct (
+          dispatch => axiosRequest(axios.get("./products/" + this.props.match.params.id),
+            data => dispatch(updateProductInfoFx(data.data))
+          )
+
+        )
+      }
 
     }
 
-    componentDidUpdate() {
 
-    }
 
     // Add / Edit Product
     upsert = (e) => {
 
       e.preventDefault()
-
-      const {title, description, user, fields, clearTextbox} = this.props    
+// debugger
+      const {title, description, user, clearTextbox} = this.props    
 
       // Object to Send
       const data = {
@@ -344,12 +365,18 @@ export const ProductDetails = connect(
           title
       }
 
-      alert (JSON.stringify(data))
+      // Put or Post Request
+      if (!this.props.match.params.id) {
+        var req = axios.post('/products', data)
+      }  else {
+        req = axios.put('/products/' + this.props.match.params.id, data)
+      }
+
+      this.props.addProduct(insertData(data, clearTextbox, req))
       //request
       // reputation: 0 (update when product review is added)
       // reviews:[] (push review to array. Create field when first review is Added)
       // img: "picture http path"
-      clearTextbox()
 
     }
 
@@ -357,7 +384,7 @@ export const ProductDetails = connect(
     cancel = () => this.props.history.goBack()
 
     render () {
-      
+      // debugger
       // debugger
       const {title, description, updateTextbox} = this.props 
 
@@ -448,24 +475,39 @@ export const ProductDetails = connect(
     }
   }
 
-  const productInsertDispachProps = (dispatch)=>{
-    return{
-      newProductData: (data)=>{
-        return dispatch({
-          addProduct: (data) => dispatch(),
+  const productInsertDispachProps = (dispatch)=>({
+    // return{
+
+
+
+      // newProductData: (data)=>{
+        // return dispatch({
+          // type:"sometype",
+          addProduct: (fx) => dispatch(fx),
           updateTextbox: ({target}) => dispatch(productTextboxChangeFx(target.name, target.value)),
           clearTextbox: () => dispatch(productClearTextboxFx())
-        })
-      }
-    }
-  }
+          // updateProductInfoFx
+        // }
+      // }
+    // }
+  })
 
-  const insertData = (dispatch)=>{
-    axios.post('/create-products')
-    .then(response =>{
-      // debugger
-      return dispatch(productTextboxChangeFx(response.data.data))
-    })
+  
+  function insertData  (data, clear, axiosFx) {
+
+    return dispatch => {
+      
+      axiosFx.then(response =>{
+        
+        // Message Success
+        message(response.data, "Product Added/Updated" )
+
+        // Clear Textbox Fields
+        clear()
+
+      })
+      .catch(console.log)
+    }
   }
 
 

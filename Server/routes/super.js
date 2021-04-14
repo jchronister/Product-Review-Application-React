@@ -40,7 +40,7 @@ router.put("/users", (req, res) => {
 
 router.get("/logs", function(req, res) {
   
-  fs.readFile("./logs/access.log", sendJSON.bind(res))
+  fs.readFile("./access.log", sendJSON.bind(res))
   // fs.createReadStream() Do this with Streaming?
 
 })
