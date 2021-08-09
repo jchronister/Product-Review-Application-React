@@ -1,7 +1,7 @@
 # CS568 Final Project
 ## Sirak Tekle & Jeremy Chronister
 
-## Product Review Application - React
+## Product Review Application - Express Server
 
 ## Description
 1. Users can add, delete, update and fetch all the products in the application.

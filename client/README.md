@@ -1,70 +1,29 @@
-# Getting Started with Create React App
+# CS568 Final Project
+## Sirak Tekle & Jeremy Chronister
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Product Review Application - React
 
-## Available Scripts
+## Description
+1. Users can add, delete, update and fetch all the products in the application.
+a. For delete and update: Only the creator of the product can do these operations.
+2. Users can add, delete, update and fetch reviews of a product.
+a. For delete and update: Only the creator of the review can do these operations.
+3. Products have reputation points:
+a. An excellent rating adds 2 points to the product’s reputation score.
+b. A bad rating deducts 1 point from the product’s reputation score.
+c. A good rating does not change a product’s reputation score.
+4. Users sign in / sign up before they can use the application.
+5. Products can be sorted by reputation.
+6. All backend API request are logged to file.
 
-In the project directory, you can run:
+## SuperUser Account
+1. The user collection in the database has a superuser account. (Role is superuser).
+2. Superuser may log in to the Application to see a dashboard with the following functionalities:
+a. List all users’ accounts, activates/deactivates, and reset their password.
+b. List all the requests from the log.
 
-### `npm start`
+## Technical Details
+1. Redux manages the state.
+2. JWT for authentication and authorization.
+3. Server Follows the REST convention.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
